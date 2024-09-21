@@ -17,6 +17,7 @@ typedef struct
 void cadastrarProduto(Produto *p[], int *index);
 void listarProdutos(Produto *p[], int *index);
 void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex,int *contador);
+void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex);
 int menu(Produto *p[], Carrinho *c[], int carrinhoIndex, int *contador);
 
 
@@ -80,6 +81,15 @@ void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index
     (*carrinhoIndex)++;
 }
 
+
+void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex) {
+    printf("\t-------------Itens do Carrinho-------------\n");
+    for (int i = 0; i < *carrinhoIndex - 11; i++) {
+        printf("Item: %s", c[i]->item.nome);
+        printf("Quantidade do item: %d\n", c[i]->quantidade);
+    }
+}
+
 int menu(Produto *p[], Carrinho *c[], int carrinhoIndex, int *contador) {
     int opc = 0;
     do
@@ -112,7 +122,7 @@ int menu(Produto *p[], Carrinho *c[], int carrinhoIndex, int *contador) {
                 comprarProdutos(p, c, &carrinhoIndex, contador);
                 break;
             case 4:
-            
+                visualizarCarrinho(c, &carrinhoIndex);
                 break;
             case 5:
             
