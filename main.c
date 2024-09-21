@@ -14,6 +14,29 @@ typedef struct
     int quantidade;
 } Carrinho;
 
+void cadastrarProduto(Produto *p[], int index);
+void listarProdutos(Produto *p[], int index);
+void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex,int contador);
+int menu(Produto *p[], Carrinho *c[], int carrinhoIndex, int contador);
+
+
+int main() {
+    Produto *p[50];
+    Carrinho *c[50];
+    int opc = 0;
+    int cont = 0;
+    int carrinhoIndex = 0;
+
+    do
+    {
+        opc = menu(p, c, carrinhoIndex, cont);
+        cont++;
+    } while (opc == 0);
+    
+    return 0;
+}
+
+
 void cadastrarProduto(Produto *p[], int index) {
     p[index] = (Produto *) malloc(sizeof(Produto));
     printf("Digite o codigo do produto: ");
@@ -41,7 +64,24 @@ void listarProdutos(Produto *p[], int index) {
     }
 }
 
-void menu(Produto *p[],int contador) {
+void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int index) {
+    c[*carrinhoIndex] = (Carrinho *) malloc(sizeof(Carrinho));
+    int opc = 0;
+    int quantidade = 0;
+    do {
+        printf("Qual produto gostaria de comprar? \n");
+        listarProdutos(p, index);
+        printf("Sua escolha: ");
+        scanf("%d", &opc);
+        c[*carrinhoIndex]->item = *p[opc];
+        printf("Qual a quantidade? ");
+        scanf("%d", &quantidade);
+        c[*carrinhoIndex]->quantidade = quantidade;
+    } while (opc < 0 || opc >= index);
+    (*carrinhoIndex)++;
+}
+
+int menu(Produto *p[], Carrinho *c[], int carrinhoIndex, int contador) {
     int opc = 0;
     do
     {   
@@ -62,12 +102,14 @@ void menu(Produto *p[],int contador) {
             {
             case 1:
                 cadastrarProduto(p, contador);
+                return 0;
                 break;
             case 2:
                 listarProdutos(p, contador);
+                return 0;
                 break;
             case 3:
-            
+                comprarProdutos(p, c, &carrinhoIndex, contador);
                 break;
             case 4:
             
@@ -76,26 +118,10 @@ void menu(Produto *p[],int contador) {
             
                 break;    
             case 6:
+                return -1;
                 break;
             }
         }
     } while (opc < 1 || opc > 6);
-}
-
-
-
-int main() {
-    Produto *p[50];
-    // Carrinho *c[50];
-    int opc = 0;
-    int cont = 0;
-
-    do
-    {
-        menu(p, cont);
-        cont++;
-    } while (opc == 0);
-    
-    
     return 0;
 }
