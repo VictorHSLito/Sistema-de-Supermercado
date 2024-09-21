@@ -14,10 +14,10 @@ typedef struct
     int quantidade;
 } Carrinho;
 
-void cadastrarProduto(Produto *p[], int index);
-void listarProdutos(Produto *p[], int index);
-void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex,int contador);
-int menu(Produto *p[], Carrinho *c[], int carrinhoIndex, int contador);
+void cadastrarProduto(Produto *p[], int *index);
+void listarProdutos(Produto *p[], int *index);
+void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex,int *contador);
+int menu(Produto *p[], Carrinho *c[], int carrinhoIndex, int *contador);
 
 
 int main() {
@@ -29,30 +29,29 @@ int main() {
 
     do
     {
-        opc = menu(p, c, carrinhoIndex, cont);
-        cont++;
+        opc = menu(p, c, carrinhoIndex, &cont);
     } while (opc == 0);
     
     return 0;
 }
 
 
-void cadastrarProduto(Produto *p[], int index) {
-    p[index] = (Produto *) malloc(sizeof(Produto));
+void cadastrarProduto(Produto *p[], int *index) {
+    p[*index] = (Produto *) malloc(sizeof(Produto));
     printf("Digite o codigo do produto: ");
-    scanf("%d", &p[index]->codigo);
+    scanf("%d", &p[*index]->codigo);
     setbuf(stdin, NULL);
     printf("Digite o nome do produto: ");
-    fgets(p[index]->nome, sizeof(p[index]->nome), stdin);
+    fgets(p[*index]->nome, sizeof(p[*index]->nome), stdin);
     setbuf(stdin, NULL);
     printf("Digite o preco do produto: ");
-    scanf("%f", &p[index]->preco);
+    scanf("%f", &p[*index]->preco);
     setbuf(stdin, NULL);
 }
 
-void listarProdutos(Produto *p[], int index) {
-    if (p[index] != NULL) {
-        for (int i = 0; i < index; i++) {
+void listarProdutos(Produto *p[], int *index) {
+    if (p[*index] != NULL) {
+        for (int i = 0; i < *index; i++) {
             printf("\t-------------Produto #%d-------------\n", i+1);
             printf("Codigo do produto: %d\n", p[i]->codigo);
             printf("Nome do produto: %s", p[i]->nome);
@@ -60,15 +59,15 @@ void listarProdutos(Produto *p[], int index) {
         }
     }
     else {
-        printf("Nenhum produto foi cadastrado no index %d!", index);
+        printf("Nenhum produto foi cadastrado no index %d!", *index);
     }
 }
 
-void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int index) {
+void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index) {
     c[*carrinhoIndex] = (Carrinho *) malloc(sizeof(Carrinho));
     int opc = 0;
     int quantidade = 0;
-    do {
+    
         printf("Qual produto gostaria de comprar? \n");
         listarProdutos(p, index);
         printf("Sua escolha: ");
@@ -77,11 +76,11 @@ void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int index)
         printf("Qual a quantidade? ");
         scanf("%d", &quantidade);
         c[*carrinhoIndex]->quantidade = quantidade;
-    } while (opc < 0 || opc >= index);
+    
     (*carrinhoIndex)++;
 }
 
-int menu(Produto *p[], Carrinho *c[], int carrinhoIndex, int contador) {
+int menu(Produto *p[], Carrinho *c[], int carrinhoIndex, int *contador) {
     int opc = 0;
     do
     {   
@@ -102,6 +101,7 @@ int menu(Produto *p[], Carrinho *c[], int carrinhoIndex, int contador) {
             {
             case 1:
                 cadastrarProduto(p, contador);
+                (*contador)++;
                 return 0;
                 break;
             case 2:
