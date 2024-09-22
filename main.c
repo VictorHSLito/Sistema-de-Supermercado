@@ -111,6 +111,7 @@ void cadastrarProduto(Produto *p[], int *index) {
 }
 
 void listarProdutos(Produto *p[], int *index) {
+    /*Lista todos os produtos cadastrados*/
     if (*index != 0) {
         for (int i = 0; i < *index; i++) {
             printf("\t-------------Produto #%d-------------\n", i);
@@ -160,13 +161,14 @@ void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index
 }
 
 void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex) {
+    /*Função que mostrará todos os itens contidos no Carrinho*/
     if (*carrinhoIndex != 0) {
         printf("\t-------------Itens do Carrinho-------------\n");
         for (int i = 0; i < *carrinhoIndex; i++) {
         printf("Item: %s", c[i]->item.nome);
         printf("Quantidade do item: %d\n", c[i]->quantidade);
         }
-    temNoCarrinho(c, carrinhoIndex);
+    temNoCarrinho(c, carrinhoIndex); // Está é uma função auxiliar para saber se já algum produto no carrinho, caso o seu carrinho esteja muito cheio
     }
     else {
         printf("Carrinho vazio!\n");
@@ -174,6 +176,7 @@ void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex) {
 }
 
 void finalizarPedido(Carrinho *c[], int *carrinhoIndex) {
+    /*Essa função mostrará o total gerado pelas compras dos produtos*/
     if (*carrinhoIndex != 0) {
         printf("\t-------------Total a Pagar-------------\n");
         float total = 0; 
@@ -198,6 +201,7 @@ void finalizarPedido(Carrinho *c[], int *carrinhoIndex) {
 }
 
 void temNoCarrinho(Carrinho *c[], int *carrinhoIndex) {
+    /*Função auxiliar para realizar busca de um Produto no Carrinho*/
     int aux = 0;
     if (*carrinhoIndex != 0) {
         printf("Digite o codigo do produto que queira verificar se esta no carrinho: ");
@@ -216,7 +220,7 @@ void temNoCarrinho(Carrinho *c[], int *carrinhoIndex) {
 
 int verificaCarrinho (Produto *p[], Carrinho *c[], int *carrinhoIndex, int opc) {
     /*Adicionei essa função que irá verificar se o produto que o usuário está tentando
-    comprar já está no carrinho, caso esteja ele adicionará mais quantidade dele*/
+    comprar já está no carrinho, caso esteja, ele adicionará mais quantidades dele*/
     for (int i = 0; i < *carrinhoIndex; i++) { // Loop que percorrerar toda a estrutura do Carrinho
             if (c[i]->item.codigo == p[opc]->codigo) {
                 int aux = 0;
@@ -231,7 +235,7 @@ int verificaCarrinho (Produto *p[], Carrinho *c[], int *carrinhoIndex, int opc) 
 }
 
 int verificaProduto(Produto *p[], int *index, int codigo) {
-    /*Semelhante à função verifica carrinho, no caso verificará se o produto já está
+    /*Semelhante à função verificaCarrinho, no caso verificará se o produto já está
     cadastrado com o código digitado, caso contrário retorna 0*/
     for (int i = 0; i < *index; i++) {
         if (p[i]->codigo == codigo) {
