@@ -18,6 +18,7 @@ void cadastrarProduto(Produto *p[], int *index);
 void listarProdutos(Produto *p[], int *index);
 void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex,int *contador);
 void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex);
+void finalizarPedido(Carrinho *c[], int *carrinhoIndex);
 int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador);
 
 
@@ -56,7 +57,7 @@ void listarProdutos(Produto *p[], int *index) {
             printf("\t-------------Produto #%d-------------\n", i);
             printf("Codigo do produto: %d\n", p[i]->codigo);
             printf("Nome do produto: %s", p[i]->nome);
-            printf("Preco do produto: %f\n", p[i]->preco);
+            printf("Preco do produto: %.2f\n", p[i]->preco);
         }
     }
     else {
@@ -88,6 +89,25 @@ void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex) {
         printf("Item: %s", c[i]->item.nome);
         printf("Quantidade do item: %d\n", c[i]->quantidade);
     }
+}
+
+void finalizarPedido(Carrinho *c[], int *carrinhoIndex) {
+    printf("\t-------------Total a Pagar-------------\n");
+    float total = 0;
+    for (int i = 0; i < *carrinhoIndex; i++) {
+        total += c[i]->quantidade*c[i]->item.preco;
+    }
+
+    printf("\tPreco Final: %.2f\n", total);
+    printf("\tEsvaziando carrinho...\n");
+
+    for (int i = 0 ; i < *carrinhoIndex; i++) {
+        free(c[i]); // Esvazia a memória alocada para o carrinho
+        c[i] = NULL; // Faz com que não haja ponteiros soltos no programa
+    }
+    (*carrinhoIndex) = 0; // Atualiza o index do carrinho para 0
+
+    printf("\tCarrinho esvaziado com sucesso!\n");
 }
 
 int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador) {
@@ -125,7 +145,7 @@ int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador) {
                 visualizarCarrinho(c, carrinhoIndex);
                 break;
             case 5:
-            
+                finalizarPedido(c, carrinhoIndex);
                 break;    
             case 6:
                 return -1;
