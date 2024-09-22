@@ -64,7 +64,6 @@ int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador) {
             {
             case 1:
                 cadastrarProduto(p, contador);
-                (*contador)++; // Atualiza o contador de produtos sempre que um novo produto é cadastrado
                 break;
             case 2:
                 listarProdutos(p, contador);
@@ -100,9 +99,13 @@ void cadastrarProduto(Produto *p[], int *index) {
         printf("Digite o nome do produto: ");
         fgets(p[*index]->nome, sizeof(p[*index]->nome), stdin);
         setbuf(stdin, NULL);
-        printf("Digite o preco do produto: ");
-        scanf("%f", &p[*index]->preco);
-        setbuf(stdin, NULL);
+        do {
+            printf("Digite o preco do produto: ");
+            scanf("%f", &p[*index]->preco);
+            setbuf(stdin, NULL);
+        } while (p[*index]->preco <= 0);
+        
+        (*index)++; // Atualiza o contador de produtos sempre que um novo produto é cadastrado
         printf("PRODUTO CADASTRADO COM SUCESSO!\n");
     }    
 }
@@ -133,13 +136,18 @@ void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index
         int aux = 0;
         printf("Qual produto gostaria de comprar? \n");
         listarProdutos(p, index); // Somente foi passado como parametro a estrutura Produto e o contador dos produtos para que chamasse a função
-        printf("Sua escolha: ");
-        scanf("%d", &opc);
+        do {
+            printf("Sua escolha: ");
+            scanf("%d", &opc);
+        } while (opc > *index - 1); // Impede o usuário de digitar uma opção fora do index    
+        
         aux = verificaCarrinho(p, c, carrinhoIndex, opc);
         if (aux == 0) {
             c[*carrinhoIndex]->item = *p[opc]; // Aqui estarei dizendo que o ponteiro C apontará para o ponteiro da estrutura Produto de acordo com opção escolhida
-            printf("Qual a quantidade? ");
-            scanf("%d", &quantidade);
+            do {
+              printf("Qual a quantidade? ");
+                scanf("%d", &quantidade);
+            } while (quantidade <= 0); // Impede o usuario de digitar uma quantidade negativa ou zero
             c[*carrinhoIndex]->quantidade = quantidade;
             (*carrinhoIndex)++; // Atualiza o contador do carrinho sempre que um novo produto é colocado no carrinho
             printf("PRODUTO ADICIONADO AO CARRINHO COM SUCESSO!\n");
@@ -224,7 +232,7 @@ int verificaCarrinho (Produto *p[], Carrinho *c[], int *carrinhoIndex, int opc) 
 
 int verificaProduto(Produto *p[], int *index, int codigo) {
     /*Semelhante à função verifica carrinho, no caso verificará se o produto já está
-    cadastro com o código digitado, caso contrário retorna 0*/
+    cadastrado com o código digitado, caso contrário retorna 0*/
     for (int i = 0; i < *index; i++) {
         if (p[i]->codigo == codigo) {
             printf("Opa! Ja existe um produto com esse codigo! Tente novamente\n");
