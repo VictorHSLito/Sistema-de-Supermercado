@@ -20,7 +20,7 @@ void listarProdutos(Produto *p[], int *index);
 void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex,int *contador);
 void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex);
 void finalizarPedido(Carrinho *c[], int *carrinhoIndex);
-void temNoCarrinho(Produto *p[], Carrinho *c[], int *carrinhoIndex);
+void temNoCarrinho(Carrinho *c[], int *carrinhoIndex);
 
 /*Programa Principal*/
 int main() {
@@ -141,28 +141,56 @@ void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index
 }
 
 void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex) {
-    printf("\t-------------Itens do Carrinho-------------\n");
-    for (int i = 0; i < *carrinhoIndex; i++) {
+    if (*carrinhoIndex != 0) {
+        printf("\t-------------Itens do Carrinho-------------\n");
+        for (int i = 0; i < *carrinhoIndex; i++) {
         printf("Item: %s", c[i]->item.nome);
         printf("Quantidade do item: %d\n", c[i]->quantidade);
+        }
+    temNoCarrinho(c, carrinhoIndex);
+    }
+    else {
+        printf("Carrinho vazio!\n");
     }
 }
 
 void finalizarPedido(Carrinho *c[], int *carrinhoIndex) {
-    printf("\t-------------Total a Pagar-------------\n");
-    float total = 0; 
-    for (int i = 0; i < *carrinhoIndex; i++) { // Loop que irá interar por todos os itens do carrinho
-        total += c[i]->quantidade*c[i]->item.preco; // Fará a multiplicação da quantidade dos itens pelo respectivo preço
+    if (*carrinhoIndex != 0) {
+        printf("\t-------------Total a Pagar-------------\n");
+        float total = 0; 
+        for (int i = 0; i < *carrinhoIndex; i++) { // Loop que irá interar por todos os itens do carrinho
+            total += c[i]->quantidade*c[i]->item.preco; // Fará a multiplicação da quantidade dos itens pelo respectivo preço
+        }
+
+        printf("\tPreco Final: %.2f\n", total);
+        printf("\tEsvaziando carrinho...\n");
+
+        for (int i = 0 ; i < *carrinhoIndex; i++) {
+            free(c[i]); // Esvazia a memória alocada para o carrinho
+            c[i] = NULL; // Faz com que não haja ponteiros soltos no programa
+        }
+        (*carrinhoIndex) = 0; // Atualiza o index do carrinho para 0
+
+        printf("\tCarrinho esvaziado com sucesso!\n");
     }
-
-    printf("\tPreco Final: %.2f\n", total);
-    printf("\tEsvaziando carrinho...\n");
-
-    for (int i = 0 ; i < *carrinhoIndex; i++) {
-        free(c[i]); // Esvazia a memória alocada para o carrinho
-        c[i] = NULL; // Faz com que não haja ponteiros soltos no programa
+    else {
+        printf("Nao ha como fechar pedido, pois o seu carrinho esta vazio!\n");
     }
-    (*carrinhoIndex) = 0; // Atualiza o index do carrinho para 0
-
-    printf("\tCarrinho esvaziado com sucesso!\n");
 }
+
+void temNoCarrinho(Carrinho *c[], int *carrinhoIndex) {
+    int aux = 0;
+    if (*carrinhoIndex != 0) {
+        printf("Digite o codigo do produto que queira verificar se esta no carrinho: ");
+        scanf("%d", &aux);
+        for (int i = 0; i < *carrinhoIndex; i++) {
+            if (c[i]->item.codigo == aux) {
+                printf("Produto está no carrinho!\n");
+                break;
+            }
+            else {
+            printf("Nao foi encontrado esse produto no carrinho!\n");
+            }
+        }   
+    }
+}   
