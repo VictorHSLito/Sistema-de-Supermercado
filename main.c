@@ -1,33 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct 
-{
+/*Estruturas que serão utilizadas no sistema*/
+typedef struct {
     int codigo;
     char nome[30];
     float preco;
 } Produto;
 
-typedef struct 
-{
+typedef struct {
     Produto item;
     int quantidade;
 } Carrinho;
 
+/*Declaração implícita das funções que são utilizadas durante o programa*/
+int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador);
 void cadastrarProduto(Produto *p[], int *index);
 void listarProdutos(Produto *p[], int *index);
 void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex,int *contador);
 void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex);
 void finalizarPedido(Carrinho *c[], int *carrinhoIndex);
-int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador);
+void temNoCarrinho(Produto *p[], Carrinho *c[], int *carrinhoIndex);
 
-
+/*Programa Principal*/
 int main() {
-    Produto *p[50];
-    Carrinho *c[50];
-    int opc = 0;
-    int cont = 0;
-    int carrinhoIndex = 0;
+    Produto *p[50]; // Cria um array de 50 espaços da estrutura Produtos
+    Carrinho *c[50]; // Cria um array de 50 espaços da estrutura Produtos
+    int opc = 0; // Variável auxiliar que fará o controle do loop do programa
+    int cont = 0; // Contador que irá operar sobre os index dos Produtos
+    int carrinhoIndex = 0; //Contador que irá operar sobre os index do Carrinho
 
     do
     {
@@ -37,81 +38,11 @@ int main() {
     return 0;
 }
 
-
-void cadastrarProduto(Produto *p[], int *index) {
-    p[*index] = (Produto *) malloc(sizeof(Produto));
-    printf("Digite o codigo do produto: ");
-    scanf("%d", &p[*index]->codigo);
-    setbuf(stdin, NULL);
-    printf("Digite o nome do produto: ");
-    fgets(p[*index]->nome, sizeof(p[*index]->nome), stdin);
-    setbuf(stdin, NULL);
-    printf("Digite o preco do produto: ");
-    scanf("%f", &p[*index]->preco);
-    setbuf(stdin, NULL);
-}
-
-void listarProdutos(Produto *p[], int *index) {
-    if (p[*index] != NULL) {
-        for (int i = 0; i < *index; i++) {
-            printf("\t-------------Produto #%d-------------\n", i);
-            printf("Codigo do produto: %d\n", p[i]->codigo);
-            printf("Nome do produto: %s", p[i]->nome);
-            printf("Preco do produto: %.2f\n", p[i]->preco);
-        }
-    }
-    else {
-        printf("Nenhum produto foi cadastrado no index %d!", *index);
-    }
-}
-
-void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index) {
-    c[*carrinhoIndex] = (Carrinho *) malloc(sizeof(Carrinho));
-    int opc = 0;
-    int quantidade = 0;
-    
-        printf("Qual produto gostaria de comprar? \n");
-        listarProdutos(p, index);
-        printf("Sua escolha: ");
-        scanf("%d", &opc);
-        c[*carrinhoIndex]->item = *p[opc];
-        printf("Qual a quantidade? ");
-        scanf("%d", &quantidade);
-        c[*carrinhoIndex]->quantidade = quantidade;
-    
-    (*carrinhoIndex)++;
-}
-
-
-void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex) {
-    printf("\t-------------Itens do Carrinho-------------\n");
-    for (int i = 0; i < *carrinhoIndex; i++) {
-        printf("Item: %s", c[i]->item.nome);
-        printf("Quantidade do item: %d\n", c[i]->quantidade);
-    }
-}
-
-void finalizarPedido(Carrinho *c[], int *carrinhoIndex) {
-    printf("\t-------------Total a Pagar-------------\n");
-    float total = 0;
-    for (int i = 0; i < *carrinhoIndex; i++) {
-        total += c[i]->quantidade*c[i]->item.preco;
-    }
-
-    printf("\tPreco Final: %.2f\n", total);
-    printf("\tEsvaziando carrinho...\n");
-
-    for (int i = 0 ; i < *carrinhoIndex; i++) {
-        free(c[i]); // Esvazia a memória alocada para o carrinho
-        c[i] = NULL; // Faz com que não haja ponteiros soltos no programa
-    }
-    (*carrinhoIndex) = 0; // Atualiza o index do carrinho para 0
-
-    printf("\tCarrinho esvaziado com sucesso!\n");
-}
-
 int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador) {
-    int opc = 0;
+    /*Aqui todas as variáveis foram passadas por referência
+    pois o controle de valores delas serão todos feitos através das
+    funções e não da função main*/
+    int opc = 0; // Variável auxiliar que será usada para o switch-case
     do
     {   
         printf("\tBem vindo(a) ao menu! O que gostaria de fazer?\n");
@@ -131,12 +62,10 @@ int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador) {
             {
             case 1:
                 cadastrarProduto(p, contador);
-                (*contador)++;
-                return 0;
+                (*contador)++; // Atualiza o contador de produtos sempre que um novo produto é cadastrado
                 break;
             case 2:
                 listarProdutos(p, contador);
-                return 0;
                 break;
             case 3:
                 comprarProdutos(p, c, carrinhoIndex, contador);
@@ -148,10 +77,92 @@ int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador) {
                 finalizarPedido(c, carrinhoIndex);
                 break;    
             case 6:
-                return -1;
+                return -1; // Retorna -1 para que o loop do-while na função main pare de executar
                 break;
             }
         }
     } while (opc < 1 || opc > 6);
-    return 0;
+    return 0; // Retorna 0 para que o loop do-while na função main continue executando
+}
+
+void cadastrarProduto(Produto *p[], int *index) {
+    /*Aqui é passado a estrutura Produtos e o contador
+    que irá atualizar quando um novo produto for adicionado*/ 
+    p[*index] = (Produto *) malloc(sizeof(Produto)); // Aloca memória para um ponteiro p do tipo Produto, que conterá as informações
+    printf("Digite o codigo do produto: ");
+    scanf("%d", &p[*index]->codigo);
+    setbuf(stdin, NULL); // Função que limpa o buffer do teclado após os scanf`s
+    printf("Digite o nome do produto: ");
+    fgets(p[*index]->nome, sizeof(p[*index]->nome), stdin);
+    setbuf(stdin, NULL);
+    printf("Digite o preco do produto: ");
+    scanf("%f", &p[*index]->preco);
+    setbuf(stdin, NULL);
+}
+
+void listarProdutos(Produto *p[], int *index) {
+    if (*index != 0) {
+        for (int i = 0; i < *index; i++) {
+            printf("\t-------------Produto #%d-------------\n", i);
+            printf("Codigo do produto: %d\n", p[i]->codigo);
+            printf("Nome do produto: %s", p[i]->nome);
+            printf("Preco do produto: %.2f\n", p[i]->preco);
+        }
+    }
+    else {
+        printf("Nenhum produto foi cadastrado ainda!\n");
+        printf("Tente cadastrar um produto primeiro...\n");
+    }
+}
+
+void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index) {
+    /*Aqui são passados 4 parâmetros, o da estrutura Produtos, Carrinho, contador do carrinho
+    e o contador dos produtos*/
+    c[*carrinhoIndex] = (Carrinho *) malloc(sizeof(Carrinho)); // Aloca memória para um ponteiro da estrutura Carrinho
+    int opc = 0; // Variável que será usada para escolher o produto
+    int quantidade = 0; // Variável que será usada para escolhe a quantidade
+
+    if (*index != 0) {
+        printf("Qual produto gostaria de comprar? \n");
+        listarProdutos(p, index); // Somente foi passado como parametro a estrutura Produto e o contador dos produtos para que chamasse a função
+        printf("Sua escolha: ");
+        scanf("%d", &opc);
+        c[*carrinhoIndex]->item = *p[opc]; // Aqui estarei dizendo que o ponteiro C apontará para o ponteiro da estrutura Produto de acordo com opção escolhida
+        printf("Qual a quantidade? ");
+        scanf("%d", &quantidade);
+        c[*carrinhoIndex]->quantidade = quantidade;
+
+        (*carrinhoIndex)++; // Atualiza o contador do carrinho sempre que um novo produto é colocado no carrinho
+    }
+    else {
+        printf("Nao eh possivel comprar! Nenhum produto foi cadastrado ainda!\n");
+        printf("Tente cadastrar um produto primeiro...\n");
+    }
+}
+
+void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex) {
+    printf("\t-------------Itens do Carrinho-------------\n");
+    for (int i = 0; i < *carrinhoIndex; i++) {
+        printf("Item: %s", c[i]->item.nome);
+        printf("Quantidade do item: %d\n", c[i]->quantidade);
+    }
+}
+
+void finalizarPedido(Carrinho *c[], int *carrinhoIndex) {
+    printf("\t-------------Total a Pagar-------------\n");
+    float total = 0; 
+    for (int i = 0; i < *carrinhoIndex; i++) { // Loop que irá interar por todos os itens do carrinho
+        total += c[i]->quantidade*c[i]->item.preco; // Fará a multiplicação da quantidade dos itens pelo respectivo preço
+    }
+
+    printf("\tPreco Final: %.2f\n", total);
+    printf("\tEsvaziando carrinho...\n");
+
+    for (int i = 0 ; i < *carrinhoIndex; i++) {
+        free(c[i]); // Esvazia a memória alocada para o carrinho
+        c[i] = NULL; // Faz com que não haja ponteiros soltos no programa
+    }
+    (*carrinhoIndex) = 0; // Atualiza o index do carrinho para 0
+
+    printf("\tCarrinho esvaziado com sucesso!\n");
 }
