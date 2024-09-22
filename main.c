@@ -18,7 +18,7 @@ void cadastrarProduto(Produto *p[], int *index);
 void listarProdutos(Produto *p[], int *index);
 void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex,int *contador);
 void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex);
-int menu(Produto *p[], Carrinho *c[], int carrinhoIndex, int *contador);
+int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador);
 
 
 int main() {
@@ -30,7 +30,7 @@ int main() {
 
     do
     {
-        opc = menu(p, c, carrinhoIndex, &cont);
+        opc = menu(p, c, &carrinhoIndex, &cont);
     } while (opc == 0);
     
     return 0;
@@ -53,7 +53,7 @@ void cadastrarProduto(Produto *p[], int *index) {
 void listarProdutos(Produto *p[], int *index) {
     if (p[*index] != NULL) {
         for (int i = 0; i < *index; i++) {
-            printf("\t-------------Produto #%d-------------\n", i+1);
+            printf("\t-------------Produto #%d-------------\n", i);
             printf("Codigo do produto: %d\n", p[i]->codigo);
             printf("Nome do produto: %s", p[i]->nome);
             printf("Preco do produto: %f\n", p[i]->preco);
@@ -84,13 +84,13 @@ void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index
 
 void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex) {
     printf("\t-------------Itens do Carrinho-------------\n");
-    for (int i = 0; i < *carrinhoIndex - 11; i++) {
+    for (int i = 0; i < *carrinhoIndex; i++) {
         printf("Item: %s", c[i]->item.nome);
         printf("Quantidade do item: %d\n", c[i]->quantidade);
     }
 }
 
-int menu(Produto *p[], Carrinho *c[], int carrinhoIndex, int *contador) {
+int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador) {
     int opc = 0;
     do
     {   
@@ -119,10 +119,10 @@ int menu(Produto *p[], Carrinho *c[], int carrinhoIndex, int *contador) {
                 return 0;
                 break;
             case 3:
-                comprarProdutos(p, c, &carrinhoIndex, contador);
+                comprarProdutos(p, c, carrinhoIndex, contador);
                 break;
             case 4:
-                visualizarCarrinho(c, &carrinhoIndex);
+                visualizarCarrinho(c, carrinhoIndex);
                 break;
             case 5:
             
