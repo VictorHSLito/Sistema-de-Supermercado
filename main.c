@@ -138,7 +138,7 @@ void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index
     /*Aqui são passados 4 parâmetros, o da estrutura Produtos, Carrinho, contador do carrinho
     e o contador dos produtos*/
     c[*carrinhoIndex] = (Carrinho *) malloc(sizeof(Carrinho)); // Aloca memória para um ponteiro da estrutura Carrinho
-    int opc = 0; // Variável que será usada para escolher o produto
+    int opc = 51; // Variável que será usada para escolher o produto, inicia com 51 pois impede que o usuário digite um número negativo ou um char
     int quantidade = 0; // Variável que será usada para escolhe a quantidade
 
     if (*index != 0) {
@@ -152,12 +152,14 @@ void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index
 
             if (validaEntrada(input) != 0) {
                 printf("Digite apenas numeros!\n");
-                continue;
             }
-            opc = atoi(input);
-            if (opc > *index - 1 || opc < 0) {
+            else {
+                opc = atoi(input);
+                if (opc > *index - 1 || opc < 0) {
                 printf("Voce tentou comprar um produto inexistente! Tente novamente!\n");
+                }
             }
+            
         } while (opc > *index - 1 || opc < 0); // Impede o usuário de digitar uma opção fora do index    
         
         aux = verificaCarrinho(p, c, carrinhoIndex, opc);
