@@ -19,8 +19,10 @@ typedef struct {
 int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador);
 int validaEntrada(char *string);
 void cadastrarProduto(Produto *p[], int *index);
+void descadastrarProduto(Produto *p[], int *index);
 void listarProdutos(Produto *p[], int *index);
 void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex,int *contador);
+void removerProduto(Carrinho *c[], int *carrinhoIndex);
 void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex);
 void finalizarPedido(Carrinho *c[], int *carrinhoIndex);
 int verificaCarrinho (Produto *p[], Carrinho *c[], int *carrinhoIndex, int opc);
@@ -56,15 +58,17 @@ int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador) {
         printf("3 - Comprar Produtos\n");
         printf("4 - Visualizar Carrinho\n");
         printf("5 - Fechar Pedido\n");
-        printf("6 - Sair\n");
-
+        printf("6 - Descasdatrar Produto\n");
+        printf("7 - Remover Produto do Carrinho\n");
+        printf("8 - Sair\n");
+        
         fgets(input, sizeof(input), stdin);
         if (validaEntrada(input) != 0) {
             printf("Numero digitado invalido!\n");
             continue;
         }
         opc = atoi(input);
-        if (opc < 1 || opc > 6 ) {
+        if (opc < 1 || opc > 8 ) {
             printf("Voce digitou uma opcao invalida! Tente novamente\n\n");
         }
         else {
@@ -86,11 +90,17 @@ int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador) {
                 finalizarPedido(c, carrinhoIndex);
                 break;    
             case 6:
-                return -1; // Retorna -1 para que o loop do-while na função main pare de executar
+                descadastrarProduto(p, contador);
+                break;
+            case 7:
+                removerProduto(c, carrinhoIndex);
+                break;
+            case 8:
+                return -1;  // Retorna -1 para que o loop do-while na função main pare de executar
                 break;
             }
         }
-    } while (opc < 1 || opc > 6);
+    } while (opc < 1 || opc > 8);
     return 0; // Retorna 0 para que o loop do-while na função main continue executando
 }
 
@@ -116,6 +126,27 @@ void cadastrarProduto(Produto *p[], int *index) {
         (*index)++; // Atualiza o contador de produtos sempre que um novo produto é cadastrado
         printf("PRODUTO CADASTRADO COM SUCESSO!\n");
     }    
+}
+
+void descadastrarProduto(Produto *p[], int *index) {
+    if (*index != 0) {
+        int aux = 0;
+        do {
+        listarProdutos(p, index);
+        printf("Qual produto gostaria de descadastrar: \n");
+        scanf("%d", &aux);
+        setbuf(stdin, NULL);
+        } while (aux < 0 || aux > *index - 1);
+        free(p[aux]);
+        p[aux] = NULL;
+        (*index)--;
+        printf("Produto descadastrado com sucesso!\n");
+    }
+
+    else {
+        printf("Nao eh possivel remover um produto, pois nenhum foi cadastrado ainda!\n");
+    }
+
 }
 
 void listarProdutos(Produto *p[], int *index) {
@@ -189,6 +220,25 @@ void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index
     }
 }
 
+void removerProduto(Carrinho *c[], int *carrinhoIndex) {
+    if (*carrinhoIndex != 0) {
+        int aux = 0;
+        do {
+            visualizarCarrinho(c, carrinhoIndex);
+            printf("Qual produto gostaria de remover do carrinho? ");
+            scanf("%d", &aux);
+            setbuf(stdin, NULL);
+        } while (aux < 0 || aux > *carrinhoIndex - 1);
+        free(c[aux]);
+        c[aux] = NULL;
+        (*carrinhoIndex)--;
+    }
+    else {
+        printf("Nao eh possivel remover um produto, pois o seu carrinho esta vazio!\n");
+    }
+   
+
+}
 void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex) {
     /*Função que mostrará todos os itens contidos no Carrinho*/
     if (*carrinhoIndex != 0) {
@@ -196,6 +246,7 @@ void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex) {
         for (int i = 0; i < *carrinhoIndex; i++) {
         printf("\tItem: %s", c[i]->item.nome);
         printf("\tQuantidade do item: %d\n", c[i]->quantidade);
+        printf("\tPreco do Produto: %.2f\n", c[i]->item.preco);
         }
     //temNoCarrinho(c, carrinhoIndex); // Está é uma função auxiliar para saber se já algum produto no carrinho, caso o seu carrinho esteja muito cheio
     }
