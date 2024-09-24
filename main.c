@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 /*Estruturas que serão utilizadas no sistema*/
 typedef struct {
@@ -15,6 +17,7 @@ typedef struct {
 
 /*Declaração implícita das funções que são utilizadas durante o programa*/
 int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador);
+int validaEntrada(char *string);
 void cadastrarProduto(Produto *p[], int *index);
 void listarProdutos(Produto *p[], int *index);
 void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex,int *contador);
@@ -44,9 +47,9 @@ int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador) {
     /*Aqui todas as variáveis foram passadas por referência
     pois o controle de valores delas serão todos feitos através das
     funções e não da função main*/
+    char input[10]; // String que previnirá do usuário digitar uma opção fora do escopo
     int opc = 0; // Variável auxiliar que será usada para o switch-case
-    do
-    {   
+    do {   
         printf("\tBem vindo(a) ao menu! O que gostaria de fazer?\n");
         printf("1 - Cadastrar Produto\n");
         printf("2 - Listar Produtos\n");
@@ -54,8 +57,13 @@ int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador) {
         printf("4 - Visualizar Carrinho\n");
         printf("5 - Fechar Pedido\n");
         printf("6 - Sair\n");
-        scanf("%d", &opc);
 
+        fgets(input, sizeof(input), stdin);
+        if (validaEntrada(input) != 0) {
+            printf("Numero digitado invalido!\n");
+            continue;
+        }
+        opc = atoi(input);
         if (opc < 1 || opc > 6 ) {
             printf("Voce digitou uma opcao invalida! Tente novamente\n\n");
         }
@@ -138,16 +146,35 @@ void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index
         printf("Qual produto gostaria de comprar? \n");
         listarProdutos(p, index); // Somente foi passado como parametro a estrutura Produto e o contador dos produtos para que chamasse a função
         do {
+            char input[10];
             printf("Sua escolha: ");
-            scanf("%d", &opc);
-        } while (opc > *index - 1); // Impede o usuário de digitar uma opção fora do index    
+            fgets(input, sizeof(input), stdin);
+
+            if (validaEntrada(input) != 0) {
+                printf("Digite apenas numeros!\n");
+                continue;
+            }
+            opc = atoi(input);
+            if (opc > *index - 1 || opc < 0) {
+                printf("Voce tentou comprar um produto inexistente! Tente novamente!\n");
+            }
+        } while (opc > *index - 1 || opc < 0); // Impede o usuário de digitar uma opção fora do index    
         
         aux = verificaCarrinho(p, c, carrinhoIndex, opc);
         if (aux == 0) {
             c[*carrinhoIndex]->item = *p[opc]; // Aqui estarei dizendo que o ponteiro C apontará para o ponteiro da estrutura Produto de acordo com opção escolhida
             do {
-              printf("Qual a quantidade? ");
-                scanf("%d", &quantidade);
+                char input[10];
+                printf("Qual a quantidade? ");
+                fgets(input, sizeof(input), stdin);
+                setbuf(stdin, NULL);
+            
+                if (validaEntrada(input) != 0) {
+                    printf("Numero invalido!!!!!!!\n");
+                }
+                else {
+                    quantidade = atoi(input);
+                }
             } while (quantidade <= 0); // Impede o usuario de digitar uma quantidade negativa ou zero
             c[*carrinhoIndex]->quantidade = quantidade;
             (*carrinhoIndex)++; // Atualiza o contador do carrinho sempre que um novo produto é colocado no carrinho
@@ -165,10 +192,10 @@ void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex) {
     if (*carrinhoIndex != 0) {
         printf("\t-------------Itens do Carrinho-------------\n");
         for (int i = 0; i < *carrinhoIndex; i++) {
-        printf("Item: %s", c[i]->item.nome);
-        printf("Quantidade do item: %d\n", c[i]->quantidade);
+        printf("\tItem: %s", c[i]->item.nome);
+        printf("\tQuantidade do item: %d\n", c[i]->quantidade);
         }
-    temNoCarrinho(c, carrinhoIndex); // Está é uma função auxiliar para saber se já algum produto no carrinho, caso o seu carrinho esteja muito cheio
+    //temNoCarrinho(c, carrinhoIndex); // Está é uma função auxiliar para saber se já algum produto no carrinho, caso o seu carrinho esteja muito cheio
     }
     else {
         printf("Carrinho vazio!\n");
@@ -177,6 +204,7 @@ void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex) {
 
 void finalizarPedido(Carrinho *c[], int *carrinhoIndex) {
     /*Essa função mostrará o total gerado pelas compras dos produtos*/
+    visualizarCarrinho(c, carrinhoIndex);
     if (*carrinhoIndex != 0) {
         printf("\t-------------Total a Pagar-------------\n");
         float total = 0; 
@@ -225,8 +253,11 @@ int verificaCarrinho (Produto *p[], Carrinho *c[], int *carrinhoIndex, int opc) 
             if (c[i]->item.codigo == p[opc]->codigo) {
                 int aux = 0;
                 printf("Produto ja esta no carrinho!\n");
-                printf("Adicionar mais quantas unidades do produto no carrinho? ");
-                scanf("%d", &aux);
+                do {
+                    printf("Adicionar mais quantas unidades do produto no carrinho? ");
+                    scanf("%d", &aux);
+                    setbuf(stdin, NULL);
+                } while (aux < 0);
                 c[i]->quantidade += aux;
                 return 1;
             }
@@ -244,4 +275,21 @@ int verificaProduto(Produto *p[], int *index, int codigo) {
         }
     }
     return 0;
+}
+
+int validaEntrada(char string[]) {
+    // Remover o '\n' do final da string, se houver
+    size_t len = strlen(string);
+    if (string[len - 1] == '\n') {
+        string[len - 1] = '\0';
+    }
+
+    // Verificar se todos os caracteres são dígitos
+    for (unsigned i = 0; i < strlen(string); i++) {
+        if (!isdigit(string[i])) {
+            return 1;  // Retorna 1 se não for um número
+        }
+    }
+
+    return 0;  // Retorna 0 se a string for válida (somente números)
 }
