@@ -19,7 +19,7 @@ typedef struct {
 int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador);
 int validaEntrada(char *string);
 void cadastrarProduto(Produto *p[], int *index);
-void descadastrarProduto(Produto *p[], int *index);
+void descadastrarProduto(Produto *p[], Carrinho *c[], int *index, int *carrinhoIndex);
 void listarProdutos(Produto *p[], int *index);
 void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex,int *contador);
 void removerProduto(Carrinho *c[], int *carrinhoIndex);
@@ -90,7 +90,7 @@ int menu(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *contador) {
                 finalizarPedido(c, carrinhoIndex);
                 break;    
             case 6:
-                descadastrarProduto(p, contador);
+                descadastrarProduto(p, c, contador, carrinhoIndex);
                 break;
             case 7:
                 removerProduto(c, carrinhoIndex);
@@ -128,7 +128,8 @@ void cadastrarProduto(Produto *p[], int *index) {
     }    
 }
 
-void descadastrarProduto(Produto *p[], int *index) {
+void descadastrarProduto(Produto *p[], Carrinho *c[], int *index, int *carrinhoIndex) {
+    /*Quando um produto for descadastrado é preciso removê-lo do carrinho também*/
     if (*index != 0) {
         int aux = 0;
         do {
@@ -137,9 +138,12 @@ void descadastrarProduto(Produto *p[], int *index) {
         scanf("%d", &aux);
         setbuf(stdin, NULL);
         } while (aux < 0 || aux > *index - 1);
-        free(p[aux]);
+        free(p[aux]); // Libera a estrutra selecionada do Produto
+        free(c[aux]); // Libera a estrutra selecionada do Carrinho
         p[aux] = NULL;
+        c[aux] = NULL;
         (*index)--;
+        (*carrinhoIndex)--;
         printf("Produto descadastrado com sucesso!\n");
     }
 
@@ -169,7 +173,7 @@ void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index
     /*Aqui são passados 4 parâmetros, o da estrutura Produtos, Carrinho, contador do carrinho
     e o contador dos produtos*/
     c[*carrinhoIndex] = (Carrinho *) malloc(sizeof(Carrinho)); // Aloca memória para um ponteiro da estrutura Carrinho
-    int opc = 51; // Variável que será usada para escolher o produto, inicia com 51 pois impede que o usuário digite um número negativo ou um char
+    int opc = 999; // Variável que será usada para escolher o produto, inicia com um valor arbirtrários apenas para não gerar erro
     int quantidade = 0; // Variável que será usada para escolhe a quantidade
 
     if (*index != 0) {
@@ -221,6 +225,8 @@ void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index
 }
 
 void removerProduto(Carrinho *c[], int *carrinhoIndex) {
+    /*Essa função funciona de forma parecida com a função descadastrarProduto
+    a diferença sútil é que ela apenas remove o produto do carrinho sem "destruí-lo"*/
     if (*carrinhoIndex != 0) {
         int aux = 0;
         do {
@@ -237,7 +243,6 @@ void removerProduto(Carrinho *c[], int *carrinhoIndex) {
         printf("Nao eh possivel remover um produto, pois o seu carrinho esta vazio!\n");
     }
    
-
 }
 void visualizarCarrinho(Carrinho *c[], int *carrinhoIndex) {
     /*Função que mostrará todos os itens contidos no Carrinho*/
@@ -307,11 +312,37 @@ int verificaCarrinho (Produto *p[], Carrinho *c[], int *carrinhoIndex, int opc) 
                 int aux = 0;
                 printf("Produto ja esta no carrinho!\n");
                 do {
-                    printf("Adicionar mais quantas unidades do produto no carrinho? ");
+                    printf("O que deseja fazer:\n");
+                    printf("1 - Adicionar mais quantidade do produto\n");
+                    printf("2 - Remover quantidade do produto\n");
+                    printf("3 - Sair\n");
+                    printf("Sua escolha: ");
                     scanf("%d", &aux);
                     setbuf(stdin, NULL);
+                    if (aux == 1 || aux == 2) {
+                        int quant = 0;
+                        switch (aux) {                        
+                        case 1:                            
+                            do {
+                                printf("Quanto gostaria de adicionar? ");
+                                scanf("%d", &quant);
+                                setbuf(stdin, NULL);
+                            } while (quant <= 0);                           
+                            c[i]->quantidade += quant;
+                            return 1; // Retorna 1 para que não haja continuidade na função comprarProduto
+                        case 2: 
+                            do {
+                                printf("Quanto gostaria de remover? ");
+                                scanf("%d", &quant);
+                                setbuf(stdin, NULL);
+                            } while (quant > c[i]->quantidade);
+                            c[i]->quantidade -= quant;
+                            return 1; // Retorna 1 para que não haja continuidade na função comprarProduto
+                        case 3:
+                            return 1; // Retorna 1 para que não haja continuidade na função comprarProduto
+                        }
+                    }
                 } while (aux < 0);
-                c[i]->quantidade += aux;
                 return 1;
             }
         }
@@ -331,7 +362,7 @@ int verificaProduto(Produto *p[], int *index, int codigo) {
 }
 
 int validaEntrada(char string[]) {
-    // Remover o '\n' do final da string, se houver
+    /*Remover o '\n' do final da string, se houver*/
     size_t len = strlen(string);
     if (string[len - 1] == '\n') {
         string[len - 1] = '\0';
