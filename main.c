@@ -182,7 +182,7 @@ void comprarProdutos(Produto *p[], Carrinho *c[], int *carrinhoIndex, int *index
         listarProdutos(p, index); // Somente foi passado como parametro a estrutura Produto e o contador dos produtos para que chamasse a função
         do {
             char input[10];
-            printf("Sua escolha: ");
+            printf("Sua escolha [Digite o Index do Produto]: ");
             fgets(input, sizeof(input), stdin);
 
             if (validaEntrada(input) != 0) {
