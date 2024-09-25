@@ -15,7 +15,7 @@ O sistema possui duas estruturas básicas que irão compor todo o código, a pri
 
 ## Como Executar?
 Compile o código com um compilador para linguagem C/C++ e depois execute-o.
-Caso queira testar online, segue um link onde é só executar o código: https://onlinegdb.com/N6-yPxDe0
+Caso queira testar online, segue um link onde é só executar o código: https://onlinegdb.com/qEmtsu-_M
 
 ## Sugestões
 Estarei aberto a qualquer tipo de sugestão acerca do código, caso queira contribuir com o projeto, solicite um _Pull Request_.

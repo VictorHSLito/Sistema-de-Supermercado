@@ -1,7 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
+#include <stdio.h> // Biblioteca usada para entrada e saída de dados
+#include <stdlib.h> // Biblioteca usada para alocação dinâmica
+#include <string.h> // Biblioteca usada para tratamentos de erros com string
+#include <ctype.h> // Biblioteca usada em conjunto com a "string.h" para conversão de dados e tratamento de erros
 
 /*Estruturas que serão utilizadas no sistema*/
 typedef struct {
